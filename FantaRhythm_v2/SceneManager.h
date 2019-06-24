@@ -6,7 +6,8 @@ class SceneManager {
 public:
 	enum SCENE {
 		SCENE_TITLE,
-		SCENE_SELECTMUSIC
+		SCENE_SELECTMUSIC,
+		SCENE_NONE
 	};
 	SceneManager() = delete;
 	static void initialize();
@@ -14,7 +15,9 @@ public:
 
 	static void updateScene();
 	static void drawScene();
-	static void changeScene(SCENE nextscene);
+	static void setNextScene(SCENE next);
 private:
 	static Scene *scene;
+	static SCENE nextscene;
+	static void changeScene();
 };

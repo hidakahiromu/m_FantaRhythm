@@ -18,7 +18,7 @@ Title::~Title(void) {
 
 void Title::update(void) {
 	if (KeyA.down()) {
-		SceneManager::changeScene(SceneManager::SCENE_SELECTMUSIC);
+		SceneManager::setNextScene(SceneManager::SCENE_SELECTMUSIC);
 	}
 	else {
 		changeAlpha();

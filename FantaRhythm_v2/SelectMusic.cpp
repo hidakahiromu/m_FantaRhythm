@@ -38,7 +38,7 @@ void SelectMusic::changeState(SELECTSTATE nextstate) {
 		stateDraw = &SelectMusic::drawDifficulty;
 		break;
 	case TITLE:
-		SceneManager::changeScene(SceneManager::SCENE_TITLE);
+		SceneManager::setNextScene(SceneManager::SCENE_TITLE);
 		break;
 	case GAME:
 		break;
