@@ -16,8 +16,8 @@ SelectMusic::SelectMusic(void)  {
 	initMusic();
 	initDifficulty();
 
-	changeState(MUSIC);
-	playMusic(musiccursor);	
+	changeState(MUSIC);//初期状態を曲選択へ
+	playMusic(musiccursor);//最初の曲プレビューを再生
 }
 
 SelectMusic::~SelectMusic(void) {
@@ -48,26 +48,20 @@ void SelectMusic::changeState(SELECTSTATE nextstate) {
 
 void SelectMusic::initMusic(void) {
 	musiccursor = 0;
-	difvec.clear();
-	setVector(musicvec, U"resources/musics/main/", musiccount);
+	setArray(musicarray, U"resources/musics/main/", musiccount);
 }
 
 void SelectMusic::initDifficulty(void) {
 	difcursor = 0;
-	difvec.clear();
-	setVector(difvec, getDiffilepath(musiccursor), difcount);
+	setArray(difarray, getDiffilepath(musiccursor), difcount);
 }
 
-void SelectMusic::setVector(std::vector<String>&vec,String filepath,int& count) {//ベクターに要素を設定　要素数も設定
-	String Path;
-	count = FileSystem::DirectoryContents(filepath, false).count();
-	for (int i = 0; i < count; i++) {
-		Path = FileSystem::DirectoryContents(filepath, false).at(i);
-		vec.push_back(FileSystem::BaseName(Path));
-	}
+void SelectMusic::setArray(s3d::Array<FilePath>&array,FilePath filepath,int& count) {
+	array = FileSystem::DirectoryContents(filepath, false);
+	count = array.count();
 }
 String SelectMusic::getDiffilepath(int cursor) {//難易度ファイルパス取得
-	return (U"resources/musics/main/" + musicvec[cursor] + U"/score");
+	return (musicarray[cursor] + U"/score/");
 }
 
 void SelectMusic::update(void) {
@@ -117,6 +111,7 @@ void SelectMusic::draw(void) {
 	TextureAsset(U"back").draw();
 	//現在の状態に合わせた選択肢の描画
 	(this->*stateDraw)();
+	
 }
 void SelectMusic::difmoveCursor(void) {
 	if (KeyUp.down()) {
@@ -134,7 +129,6 @@ void SelectMusic::musicmoveCursor(void) {
 		musicrotation = -30;//選択肢を回転させるため角度を30度マイナス
 		playMusic(musiccursor);
 		initDifficulty();//曲に合わせた難易度へ初期化
-
 	}
 	if (KeyDown.down()) {
 		musiccursor == musiccount - 1 ? musiccursor = 0 : musiccursor++;
@@ -146,7 +140,7 @@ void SelectMusic::musicmoveCursor(void) {
 
 void SelectMusic::playMusic(int musicNum) {
 	delete audio;
-	audio = new Audio(U"resources/musics/main/" + musicvec[musicNum] + U"/preview.wav");
+	audio = new Audio(musicarray[musicNum] + U"/preview.wav");
 	audio->setLoop(true);
 	audio->play();
 }
@@ -160,7 +154,7 @@ void SelectMusic::drawMusic(void) {
 		int y = (Window::Height() / 2) - sin((angle)* PI / 180.0) * 500;
 		//描画
 		TextureAsset(U"title").drawAt(x, y);
-		FontAsset(U"font")(musicvec[(musiccursor - 2 + i + musiccount) % musiccount]).drawAt(x, y, Color(0, 0, 0));
+		FontAsset(U"font")(FileSystem::BaseName(musicarray[(musiccursor - 2 + i + musiccount) % musiccount])).drawAt(x, y, Color(0, 0, 0));
 	}
 }
 void SelectMusic::drawDifficulty(void) {
@@ -172,6 +166,6 @@ void SelectMusic::drawDifficulty(void) {
 		int y = (Window::Height() / 2) - sin((angle)* PI / 180.0) * 500;
 		//描画
 		TextureAsset(U"title").drawAt(x, y);
-		FontAsset(U"font")(difvec[(difcursor - 2 + i + difcount) % difcount]).drawAt(x, y, Color(0, 0, 0));
+		FontAsset(U"font")(FileSystem::BaseName(difarray[(difcursor - 2 + i + difcount) % difcount])).drawAt(x, y, Color(0, 0, 0));
 	}
 }

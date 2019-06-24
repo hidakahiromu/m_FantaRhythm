@@ -14,58 +14,28 @@ void SceneManager::updateScene() {
 	scene->update();
 }
 void SceneManager::drawScene() {
-	//シーンの呼び出し
 	scene->draw();
 }
-void SceneManager::changeScene() {
-	switch (nextscene) {
-	case SCENE_TITLE:
-		delete scene;
-		scene = new Title();
-		nextscene = SCENE_NONE;
-		break;
-	case SCENE_SELECTMUSIC:
-		delete scene;
-		scene = new SelectMusic();
-		nextscene = SCENE_NONE;
-		break;
-	case SCENE_NONE:
-		break;
-	default:
-		break;
-	}
-}
+
 void SceneManager::setNextScene(SCENE next) {
 	nextscene = next;
 }
-/*
-void SceneManager::updateScene() {
-	//シーンに変更があったとき
-	if (nowScene != nextScene) {
-		changeScene();
-		nowScene = nextScene;
-	}	
-}
 
-void SceneManager::drawScene() {
-	//シーンの呼び出し
-	nextScene = scene->update();
-	scene->draw();
-}
-
-void SceneManager::changeScene(){
-	//現在のシーンの破棄
-	delete scene;
-	//次のシーンに変更
-	switch (nextScene){
+void SceneManager::changeScene() {
+	switch (nextscene) {//nextsceneがNONE以外の時シーン移行する
 	case SCENE_TITLE:
+		delete scene;
 		scene = new Title();
+		nextscene = SCENE_NONE;
 		break;
 	case SCENE_SELECTMUSIC:
+		delete scene;
 		scene = new SelectMusic();
+		nextscene = SCENE_NONE;
+		break;
+	case SCENE_NONE://移行しない
 		break;
 	default:
 		break;
 	}
 }
-*/

@@ -22,21 +22,22 @@ private:
 	int musiccount, difcount;
 	int musiccursor, difcursor;
 	int musicrotation, difrotation;
-	
-	std::vector<String> musicvec, difvec;//要素を格納するベクター
 
-	void(SelectMusic::*stateUpdate)(void);
-	void(SelectMusic::*stateDraw)(void);
+	s3d::Array<FilePath> musicarray;
+	s3d::Array<FilePath> difarray;
 
-	void changeState(SELECTSTATE nextstate);
+	void(SelectMusic::*stateUpdate)(void);//実行する計算処理への関数ポインタ
+	void(SelectMusic::*stateDraw)(void);//実行する描画処理への関数ポインタ
+
+	void changeState(SELECTSTATE nextstate);//現在の状態を変更する
 
 	//初期化処理
 	void initDifficulty(void);
 	void initMusic(void);
 	//初期化で使用する関数
 	String getDiffilepath(int musiccursor);
-	void setVector(std::vector<String>& vec, String filepath, int& count);
-	//計算処理
+	void setArray(s3d::Array<FilePath>&array, FilePath filepath, int& count);
+	//s計算処理
 	void updateMusic(void);
 	void updateDifficulty(void);
 	//描画処理
