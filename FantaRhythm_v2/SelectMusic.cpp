@@ -70,8 +70,8 @@ void SelectMusic::update(void) {
 }
 
 void SelectMusic::updateMusic(void) {
-	musicmoveCursor();
 	if (!musicrotation) {//移動処理が完了しているとき
+		musicmoveCursor();
 		if (KeyRight.down()) {//難易度へ
 			changeState(DIFFICULTY);
 		}else if (KeyLeft.down()) {//タイトルへ戻る
@@ -83,8 +83,8 @@ void SelectMusic::updateMusic(void) {
 	}
 }
 void SelectMusic::updateDifficulty(void) {
-	difmoveCursor();//上下移動処理
 	if (!difrotation) {//移動処理が完了しているとき
+		difmoveCursor();//上下移動処理
 		if (KeyRight.down()) {//ゲームへ
 			
 		}
@@ -111,26 +111,25 @@ void SelectMusic::draw(void) {
 	TextureAsset(U"back").draw();
 	//現在の状態に合わせた選択肢の描画
 	(this->*stateDraw)();
-	
 }
 void SelectMusic::difmoveCursor(void) {
-	if (KeyUp.down()) {
+	if (KeyUp.pressed()) {
 		difcursor == 0 ? difcursor = difcount - 1 : difcursor--;//0　～　count - 1を上方向ループ
 		difrotation = -30;//選択肢を回転させるため角度を30度マイナス
 	}
-	if (KeyDown.down()) {
+	if (KeyDown.pressed()) {
 		difcursor == difcount - 1 ? difcursor = 0 : difcursor++;
 		difrotation = 30;//選択肢を回転させるため角度を30度プラス
 	}
 }
 void SelectMusic::musicmoveCursor(void) {
-	if (KeyUp.down()) {
+	if (KeyUp.pressed()) {
 		musiccursor == 0 ? musiccursor = musiccount - 1 : musiccursor--;//0　～　count - 1を上方向ループ
 		musicrotation = -30;//選択肢を回転させるため角度を30度マイナス
 		playMusic(musiccursor);
 		initDifficulty();//曲に合わせた難易度へ初期化
 	}
-	if (KeyDown.down()) {
+	if (KeyDown.pressed()) {
 		musiccursor == musiccount - 1 ? musiccursor = 0 : musiccursor++;
 		musicrotation = 30;//選択肢を回転させるため角度を30度プラス
 		playMusic(musiccursor);
