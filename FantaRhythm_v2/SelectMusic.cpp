@@ -4,6 +4,11 @@
 
 #define PI 3.141592
 
+#define DEFAULT_ANGLE 120
+#define FORWARD_ANGLE 30
+#define SPEED_ROTATION 3
+#define DEFAULT_ROTATION 30
+
 SelectMusic::SelectMusic(void)  {
 	TextureAsset::Register(U"back", U"resources/images/back/BackScreen.jpg");
 	TextureAsset::Preload(U"back");
@@ -41,6 +46,7 @@ void SelectMusic::changeState(SELECTSTATE nextstate) {
 		SceneManager::setNextScene(SceneManager::SCENE_TITLE);
 		break;
 	case GAME:
+		SceneManager::setNextScene(SceneManager::SCENE_GAME);
 		break;
 
 	}
@@ -56,7 +62,7 @@ void SelectMusic::initDifficulty(void) {
 	setArray(difarray, getDiffilepath(musiccursor), difcount);
 }
 
-void SelectMusic::setArray(s3d::Array<FilePath>&array,FilePath filepath,int& count) {
+void SelectMusic::setArray(s3d::Array<FilePath>&array,const FilePath& filepath,int& count) {
 	array = FileSystem::DirectoryContents(filepath, false);
 	count = array.count();
 }
@@ -86,9 +92,8 @@ void SelectMusic::updateDifficulty(void) {
 	if (!difrotation) {//移動処理が完了しているとき
 		difmoveCursor();//上下移動処理
 		if (KeyRight.down()) {//ゲームへ
-			
-		}
-		if (KeyLeft.down()) {//曲選択へ
+			changeState(GAME);
+		}else if (KeyLeft.down()) {//曲選択へ
 			changeState(MUSIC);
 		}
 	}
@@ -99,10 +104,9 @@ void SelectMusic::updateDifficulty(void) {
 
 void SelectMusic::rotatemusic(int& rotation) {
 	if (rotation < 0) {
-		rotation += 3;//既定の位置にくるまで1フレームおきに角度をプラス
-	}
-	if (rotation > 0) {
-		rotation -= 3;//既定の位置にくるまで1フレームおきに角度をマイナス
+		rotation += SPEED_ROTATION;//既定の位置にくるまで1フレームおきに角度をプラス
+	}else if (rotation > 0) {
+		rotation -= SPEED_ROTATION;//既定の位置にくるまで1フレームおきに角度をマイナス
 	}
 }
 
@@ -112,30 +116,38 @@ void SelectMusic::draw(void) {
 	//現在の状態に合わせた選択肢の描画
 	(this->*stateDraw)();
 }
-void SelectMusic::difmoveCursor(void) {
-	if (KeyUp.pressed()) {
-		difcursor == 0 ? difcursor = difcount - 1 : difcursor--;//0　～　count - 1を上方向ループ
-		difrotation = -30;//選択肢を回転させるため角度を30度マイナス
-	}
-	if (KeyDown.pressed()) {
-		difcursor == difcount - 1 ? difcursor = 0 : difcursor++;
-		difrotation = 30;//選択肢を回転させるため角度を30度プラス
-	}
-}
+
 void SelectMusic::musicmoveCursor(void) {
+	if (KeyUp.pressed() == 1 && KeyDown.pressed() == 1) {//上下両方押されてれば移動させない
+		return;
+	}
 	if (KeyUp.pressed()) {
 		musiccursor == 0 ? musiccursor = musiccount - 1 : musiccursor--;//0　～　count - 1を上方向ループ
-		musicrotation = -30;//選択肢を回転させるため角度を30度マイナス
+		musicrotation = -DEFAULT_ROTATION;//選択肢を回転させるため角度を30度マイナス
 		playMusic(musiccursor);
 		initDifficulty();//曲に合わせた難易度へ初期化
 	}
-	if (KeyDown.pressed()) {
+	else if (KeyDown.pressed()) {
 		musiccursor == musiccount - 1 ? musiccursor = 0 : musiccursor++;
-		musicrotation = 30;//選択肢を回転させるため角度を30度プラス
+		musicrotation = DEFAULT_ROTATION;//選択肢を回転させるため角度を30度プラス
 		playMusic(musiccursor);
 		initDifficulty();//曲に合わせた難易度へ初期化
 	}
 }
+
+void SelectMusic::difmoveCursor(void) {
+	if (KeyUp.pressed() == 1 && KeyDown.pressed() == 1) {//上下両方押されてれば移動させない
+		return;
+	}
+	if (KeyUp.pressed()) {
+		difcursor == 0 ? difcursor = difcount - 1 : difcursor--;//0　～　count - 1を上方向ループ
+		difrotation = -DEFAULT_ROTATION;//選択肢を回転させるため角度を30度マイナス
+	}else if (KeyDown.pressed()) {
+		difcursor == difcount - 1 ? difcursor = 0 : difcursor++;
+		difrotation = DEFAULT_ROTATION;//選択肢を回転させるため角度を30度プラス
+	}
+}
+
 
 void SelectMusic::playMusic(int musicNum) {
 	delete audio;
@@ -148,7 +160,7 @@ void SelectMusic::drawMusic(void) {
 	/*曲名の描画*/
 	for (int i = 0; i < 5; i++) {
 		//座標の指定
-		int angle = 120 + 30 * i + musicrotation;
+		int angle = DEFAULT_ANGLE + FORWARD_ANGLE * i + musicrotation;
 		int x = 1800 + cos((angle)* PI / 180.0) * 1000;
 		int y = (Window::Height() / 2) - sin((angle)* PI / 180.0) * 500;
 		//描画
@@ -160,11 +172,18 @@ void SelectMusic::drawDifficulty(void) {
 	/*曲名の描画*/
 	for (int i = 0; i < 5; i++) {
 		//座標の指定
-		int angle = 120 + 30 * i + difrotation;
+		int angle = DEFAULT_ANGLE + FORWARD_ANGLE * i + difrotation;
 		int x = 1800 + cos((angle)* PI / 180.0) * 1000;
 		int y = (Window::Height() / 2) - sin((angle)* PI / 180.0) * 500;
 		//描画
 		TextureAsset(U"title").drawAt(x, y);
 		FontAsset(U"font")(FileSystem::BaseName(difarray[(difcursor - 2 + i + difcount) % difcount])).drawAt(x, y, Color(0, 0, 0));
 	}
+}
+
+String SelectMusic::getMusicPath(void) {
+	return musicarray[musiccursor];
+}
+String SelectMusic::getDifPath(void) {
+	return difarray[difcursor];
 }

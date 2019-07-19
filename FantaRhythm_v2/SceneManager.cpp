@@ -1,7 +1,9 @@
 #include "SceneManager.h"
 
 Scene* SceneManager::scene;
+SceneManager::SCENE SceneManager::nowscene;
 SceneManager::SCENE SceneManager::nextscene;
+
 
 void SceneManager::initialize() {
 	scene = new Title();
@@ -10,7 +12,9 @@ void SceneManager::finalize() {
 	delete scene;
 }
 void SceneManager::updateScene() {
-	changeScene();
+	if (nowscene != nextscene) {
+		changeScene();
+	}
 	scene->update();
 }
 void SceneManager::drawScene() {
@@ -26,16 +30,22 @@ void SceneManager::changeScene() {
 	case SCENE_TITLE:
 		delete scene;
 		scene = new Title();
-		nextscene = SCENE_NONE;
 		break;
 	case SCENE_SELECTMUSIC:
 		delete scene;
 		scene = new SelectMusic();
-		nextscene = SCENE_NONE;
 		break;
-	case SCENE_NONE://移行しない
+	case SCENE_GAME:
+		if (nowscene == SCENE_SELECTMUSIC) {
+			//曲のパスと難易度選択のパスを退避
+			String musicpath = ((SelectMusic*)scene)->getMusicPath();
+			String filepath = ((SelectMusic*)scene)->getDifPath();
+			delete scene;
+			scene = new Game(musicpath,filepath);
+		}
 		break;
 	default:
 		break;
 	}
+	nowscene = nextscene;
 }

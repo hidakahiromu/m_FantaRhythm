@@ -8,6 +8,9 @@ public:
 	~SelectMusic(void);	
 	void update(void);
 	void draw(void);
+
+	String getMusicPath(void);
+	String getDifPath(void);
 private:
 	enum SELECTSTATE {
 		MUSIC,
@@ -22,6 +25,7 @@ private:
 	int musiccount, difcount;
 	int musiccursor, difcursor;
 	int musicrotation, difrotation;
+	
 
 	s3d::Array<FilePath> musicarray;
 	s3d::Array<FilePath> difarray;
@@ -36,7 +40,7 @@ private:
 	void initMusic(void);
 	//‰Šú‰»‚Åg—p‚·‚éŠÖ”
 	String getDiffilepath(int musiccursor);
-	void setArray(s3d::Array<FilePath>&array, FilePath filepath, int& count);
+	void setArray(s3d::Array<FilePath>&array, const FilePath& filepath, int& count);
 	//sŒvZˆ—
 	void updateMusic(void);
 	void updateDifficulty(void);
