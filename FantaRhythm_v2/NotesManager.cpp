@@ -192,7 +192,9 @@ void NotesManager::displayNormal(int lane, std::list<Notes>::iterator& itr) {
 		return;
 	}
 	double currentX = laneStartX[lane] + (laneJudgeX[lane] - laneStartX[lane]) * progressRate;
-	TextureAsset(U"note").drawAt(currentX, currentY);
+	double laneY = (laneJudgeY - laneStartY) ;
+	double countY = currentY / laneY;
+	TextureAsset(U"note").scaled(countY).drawAt(currentX, currentY);
 }
 void NotesManager::displayLong(int lane, std::list<Notes>::iterator& itr) {
 	double progressRateEnd = (timeRequired - (itr->longtime - nowTime)) / timeRequired;
@@ -206,15 +208,18 @@ void NotesManager::displayLong(int lane, std::list<Notes>::iterator& itr) {
 	double progressRateBgn = (timeRequired - (itr->time - nowTime)) / timeRequired;
 	double currentBgnY = laneStartY + (laneJudgeY - laneStartY) * progressRateBgn;
 	double currentBgnX = laneStartX[lane] + (laneJudgeX[lane] - laneStartX[lane]) * progressRateBgn;
-
+	double laneY = (laneJudgeY - laneStartY);
+	double countBgnY = currentBgnY / laneY;
+	double countEndY = currentEndY / laneY;
+	if (currentEndY < laneStartY ) {
+		currentEndX = laneStartX[lane];
+		currentEndY = laneStartY;
+	}
 	for (int linex = 0; linex <= 25; linex++) {
-		if (currentEndX > currentBgnX) {		
-			currentEndX = laneStartX[lane];
-			currentEndY = laneStartY;
-		}
 		Line(currentEndX + linex, currentEndY, currentBgnX + linex, currentBgnY).draw(1, Color(150 + linex * 2, 50, 50));
 		Line(currentEndX - linex, currentEndY, currentBgnX - linex, currentBgnY).draw(1, Color(150 + linex * 2, 50, 50));
+		
 	}
-	TextureAsset(U"note").drawAt(currentEndX, currentEndY);
-	TextureAsset(U"note").drawAt(currentBgnX, currentBgnY);
+	TextureAsset(U"note").scaled(countBgnY).drawAt(currentBgnX, currentBgnY);
+	TextureAsset(U"note").scaled(countEndY).drawAt(currentEndX, currentEndY);
 }
